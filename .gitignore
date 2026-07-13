@@ -1,0 +1,25 @@
+# Virtual environment
+.myenv/
+
+# NVIDIA NeMo source
+NeMo/
+
+# Training outputs
+pilot_run/
+
+# Audio dataset
+pilot_audio/
+
+# Model files
+*.nemo
+*.ckpt
+
+# Datasets
+*.parquet
+
+# Jupyter cache
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
