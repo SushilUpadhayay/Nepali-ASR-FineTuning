@@ -4,11 +4,9 @@
 # NVIDIA NeMo source
 NeMo/
 
-# Training outputs
-pilot_run/
-
 # Audio dataset
 pilot_audio/
+tuning_audio/
 
 # Model files
 *.nemo
