@@ -134,7 +134,7 @@ model:
       mt-MT: 102
       auto: 101
   train_ds:
-    manifest_filepath: d:/FineTuning/pilot_train_manifest.json
+    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/pilot_train_manifest.json
     sample_rate: 16000
     use_lhotse: true
     shard_manifests: true
@@ -287,7 +287,7 @@ model:
     default_prompt_mode: unified
     unified_auto_ratio: 0.0
   validation_ds:
-    manifest_filepath: d:/FineTuning/pilot_val_manifest.json
+    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/pilot_val_manifest.json
     sample_rate: 16000
     batch_size: 2
     shuffle: false
@@ -425,8 +425,9 @@ model:
     subsampling_factor: 8
     training_mode: true
     name: null
+    lang_field: target_lang
   test_ds:
-    manifest_filepath: d:/FineTuning/pilot_val_manifest.json
+    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/pilot_val_manifest.json
     sample_rate: 16000
     batch_size: 16
     shuffle: false
@@ -561,8 +562,9 @@ model:
     num_prompts: 128
     subsampling_factor: 8
     training_mode: false
+    lang_field: target_lang
   tokenizer:
-    dir: d:/FineTuning/extracted_tokenizer
+    dir: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/extracted_tokenizer
     type: bpe
   preprocessor:
     _target_: nemo.collections.asr.modules.AudioToMelSpectrogramPreprocessor
@@ -13770,7 +13772,7 @@ model:
     std: 0.0
   optim:
     name: adamw
-    lr: 0.01
+    lr: 0.0001
     betas:
     - 0.9
     - 0.98
@@ -26875,7 +26877,7 @@ model:
 trainer:
   devices: 1
   num_nodes: 1
-  max_epochs: 1
+  max_epochs: 5
   accelerator: auto
   precision: bf16
   log_every_n_steps: 10
@@ -26884,9 +26886,9 @@ trainer:
   enable_checkpointing: false
   logger: false
   use_distributed_sampler: false
-  max_steps: 40
+  max_steps: 70
 exp_manager:
-  exp_dir: d:/FineTuning/pilot_run
+  exp_dir: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/pilot_run
   create_tensorboard_logger: true
   create_checkpoint_callback: true
   checkpoint_callback_params:
@@ -26896,4 +26898,4 @@ exp_manager:
     always_save_nemo: true
   resume_if_exists: true
   resume_ignore_no_checkpoint: true
-init_from_nemo_model: d:/FineTuning/nemotron-3.5-asr-streaming-0.6b.nemo
+init_from_nemo_model: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/nemotron-3.5-asr-streaming-0.6b.nemo

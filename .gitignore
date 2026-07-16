@@ -1,16 +1,21 @@
 # Virtual environment
 .myenv/
+.myvenv/
 
 # NVIDIA NeMo source
 NeMo/
 
-# Audio dataset
-pilot_audio/
-tuning_audio/
+# Audio Datasets
+pilot_run/pilot_audio/
+tuning_run/tuning_audio/
 
 # Model files
 *.nemo
 *.ckpt
+
+# Model Outputs
+pilot_run/default
+tuning_run/default
 
 # Datasets
 *.parquet
@@ -21,3 +26,11 @@ tuning_audio/
 # Python cache
 __pycache__/
 *.pyc
+
+# Output logs
+full_run_capture.txt
+
+# Original Tokenizer
+extracted_tokenizer/model_config.yaml
+extracted_tokenizer/tokenizer.model
+extracted_tokenizer/vocab.txt
