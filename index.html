@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>बोल्नुहोस् — Live Nepali STT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16181d;
+    --bg: #0e1015;
+    --panel: #1a1d24;
+    --panel-line: #2a2e38;
+    --marigold: #e8a33d;
+    --marigold-dim: #8a6a35;
+    --text: #ece9e2;
+    --text-dim: #7d818c;
+    --live: #4fb888;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px 80px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 560px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--marigold);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 44px;
+    font-weight: 400;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+
+  .sub {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .console {
+    width: 100%;
+    max-width: 720px;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--ink);
+    border: 1px solid var(--panel-line);
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--marigold-dim); color: var(--text); }
+
+  button {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  #startBtn { background: var(--marigold); color: #1a1305; }
+  #stopBtn { background: transparent; color: var(--text); border: 1px solid var(--panel-line); }
+
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+  }
+
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-dim);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .dot.live {
+    background: var(--live);
+    box-shadow: 0 0 0 4px rgba(79, 184, 136, 0.15);
+  }
+
+  .meter {
+    height: 3px;
+    width: 100%;
+    background: var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--marigold);
+    transition: width 0.06s linear;
+  }
+
+  .transcript {
+    min-height: 160px;
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 26px;
+    line-height: 1.9;
+    color: var(--text);
+  }
+
+  .transcript .partial { color: var(--text-dim); }
+  .transcript .final-seg { color: var(--text); }
+  .transcript .placeholder { color: var(--text-dim); font-family: 'Space Grotesk', sans-serif; font-size: 14px; }
+
+  footer {
+    margin-top: 28px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-align: center;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Nemotron-3.5-ASR-Streaming · ne-NP</div>
+  <h1>बोल्नुहोस्</h1>
+  <div class="sub">Speak into your microphone. Text appears as the model hears it —<br>no waiting for you to finish.</div>
+</header>
+
+<div class="console">
+  <div class="row">
+    <input type="text" id="wsUrl" value="ws://localhost:8000/ws/transcribe" />
+  </div>
+
+  <div class="row">
+    <button id="startBtn">Start listening</button>
+    <button id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <div class="status-line">
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">idle</span>
+  </div>
+
+  <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+
+  <div class="transcript" id="transcript">
+    <span class="placeholder">— transcript will appear here —</span>
+  </div>
+</div>
+
+<footer>
+  Sends 16kHz mono PCM16 over a WebSocket to your local streaming server.<br>
+  Requires microphone permission and a running FastAPI backend.
+</footer>
+
+<script>
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const meterFill = document.getElementById('meterFill');
+const transcriptEl = document.getElementById('transcript');
+const wsUrlInput = document.getElementById('wsUrl');
+
+let audioCtx, workletNode, micStream, ws;
+let committedText = '';
+
+// AudioWorklet processor: runs on the audio thread, ships raw Float32
+// frames (at the device's native sample rate) back to the main thread.
+// Debug stats are sent as a separate 'debug' message rather than relying
+// on console.log inside the worklet (unreliable/invisible in some browsers).
+const workletCode = `
+function statsOf(arr) {
+  let min = Infinity, max = -Infinity, sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    const v = arr[i];
+    if (v < min) min = v;
+    if (v > max) max = v;
+    sum += v * v;
+  }
+  return { len: arr.length, min, max, rms: Math.sqrt(sum / arr.length), first10: Array.from(arr.slice(0, 10)) };
+}
+
+class PCMCapture extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.frameCount = 0;
+  }
+  process(inputs) {
+    const channel = inputs[0][0];
+    this.frameCount++;
+    const logNow = this.frameCount === 1 || this.frameCount % 50 === 0;
+
+    if (this.frameCount === 1) {
+      this.port.postMessage({ kind: 'debug', stage: '0-process-entered', frame: 1, note: 'process() called for the first time' });
+    }
+
+    if (!channel) {
+      if (logNow) this.port.postMessage({ kind: 'debug', stage: '1-worklet-read', frame: this.frameCount, note: 'inputs[0][0] is UNDEFINED -- no input reaching the worklet at all' });
+      return true;
+    }
+
+    if (logNow) {
+      this.port.postMessage({ kind: 'debug', stage: '1-worklet-read', frame: this.frameCount, stats: statsOf(channel) });
+    }
+
+    const outgoing = channel.slice(0);
+
+    if (logNow) {
+      this.port.postMessage({ kind: 'debug', stage: '2-worklet-post', frame: this.frameCount, stats: statsOf(outgoing) });
+    }
+
+    this.port.postMessage({ kind: 'audio', data: outgoing });
+    return true;
+  }
+}
+registerProcessor('pcm-capture', PCMCapture);
+`;
+
+function statsOf(arr) {
+  let min = Infinity, max = -Infinity, sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    const v = arr[i];
+    if (v < min) min = v;
+    if (v > max) max = v;
+    sum += v * v;
+  }
+  return { len: arr.length, min, max, rms: Math.sqrt(sum / arr.length), first10: Array.from(arr.slice(0, 10)) };
+}
+function statsOfInt16(arr) {
+  let min = Infinity, max = -Infinity;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] < min) min = arr[i];
+    if (arr[i] > max) max = arr[i];
+  }
+  return { len: arr.length, min, max, first10: Array.from(arr.slice(0, 10)) };
+}
+
+let debugFrameCounter = 0;
+
+function setStatus(text, live) {
+  statusText.textContent = text;
+  statusDot.classList.toggle('live', !!live);
+}
+
+function renderTranscript(partial) {
+  transcriptEl.innerHTML = '';
+  if (!committedText && !partial) {
+    transcriptEl.innerHTML = '<span class="placeholder">— transcript will appear here —</span>';
+    return;
+  }
+  if (committedText) {
+    const fin = document.createElement('span');
+    fin.className = 'final-seg';
+    fin.textContent = committedText + ' ';
+    transcriptEl.appendChild(fin);
+  }
+  if (partial) {
+    const p = document.createElement('span');
+    p.className = 'partial';
+    p.textContent = partial;
+    transcriptEl.appendChild(p);
+  }
+}
+
+// Linear-interpolation resampler: native mic rate -> 16000 Hz.
+function resampleTo16k(float32Data, inRate) {
+  if (inRate === 16000) return float32Data;
+  const ratio = inRate / 16000;
+  const outLength = Math.floor(float32Data.length / ratio);
+  const out = new Float32Array(outLength);
+  for (let i = 0; i < outLength; i++) {
+    const srcIdx = i * ratio;
+    const i0 = Math.floor(srcIdx);
+    const i1 = Math.min(i0 + 1, float32Data.length - 1);
+    const frac = srcIdx - i0;
+    out[i] = float32Data[i0] * (1 - frac) + float32Data[i1] * frac;
+  }
+  return out;
+}
+
+function float32ToPCM16(float32Data) {
+  const out = new Int16Array(float32Data.length);
+  for (let i = 0; i < float32Data.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Data[i]));
+    out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return out;
+}
+
+async function start() {
+  committedText = '';
+  renderTranscript('');
+  startBtn.disabled = true;
+
+  // AudioContext creation + resume() happens FIRST, directly in this click
+  // handler, not after an `await ws.onopen` round-trip. The earlier version
+  // created the context inside ws.onopen -- an async callback firing after
+  // a network round-trip -- which risked losing the browser's association
+  // between this context and the user's actual click ("transient
+  // activation"), leaving the context permanently 'suspended' and the
+  // entire render graph (including the worklet) never running at all.
+  audioCtx = new AudioContext(); // native rate, typically 44100 or 48000
+  console.log('[audioCtx] initial state:', audioCtx.state);
+  await audioCtx.resume();
+  console.log('[audioCtx] state after resume():', audioCtx.state);
+
+  setStatus('requesting mic…', false);
+  micStream = await navigator.mediaDevices.getUserMedia({
+    audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
+  });
+
+  const blob = new Blob([workletCode], { type: 'application/javascript' });
+  await audioCtx.audioWorklet.addModule(URL.createObjectURL(blob));
+
+  const source = audioCtx.createMediaStreamSource(micStream);
+  workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture', {
+    numberOfInputs: 1,
+    numberOfOutputs: 1,
+    outputChannelCount: [1],
+  });
+
+  // Errors thrown inside process() do NOT appear as normal console errors
+  // or unhandled promise rejections -- this dedicated event is the only
+  // way to see them. Without it, a processor crashing on every call would
+  // fail completely silently.
+  workletNode.onprocessorerror = (err) => {
+    console.error('[worklet processor error]', err);
+  };
+
+  workletNode.port.onmessage = (event) => {
+    const msg = event.data;
+
+    if (msg.kind === 'debug') {
+      console.log(`[${msg.stage}] frame ${msg.frame}`, msg.stats || msg.note);
+      return;
+    }
+
+    // msg.kind === 'audio'
+    const float32 = msg.data;
+    debugFrameCounter++;
+    const logNow = debugFrameCounter % 50 === 0;
+
+    if (logNow) {
+      console.log('[3-main-received]', 'frame', debugFrameCounter, statsOf(float32));
+    }
+
+    // level meter, cheap RMS
+    let sum = 0;
+    for (let i = 0; i < float32.length; i++) sum += float32[i] * float32[i];
+    const rms = Math.sqrt(sum / float32.length);
+    meterFill.style.width = Math.min(100, rms * 400) + '%';
+
+    const resampled = resampleTo16k(float32, audioCtx.sampleRate);
+    const pcm16 = float32ToPCM16(resampled);
+
+    if (logNow) {
+      console.log('[4-pcm16]', 'frame', debugFrameCounter, statsOfInt16(pcm16));
+    }
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      if (logNow) {
+        console.log('[5-pre-send]', 'frame', debugFrameCounter, 'byteLength:', pcm16.buffer.byteLength, statsOfInt16(pcm16));
+      }
+      ws.send(pcm16.buffer);
+    }
+  };
+
+  source.connect(workletNode);
+
+  // Route through a muted GainNode into destination so the worklet's branch
+  // of the graph is genuinely active (see bug-fix note above this function),
+  // without producing any audible playback.
+  const silentSink = audioCtx.createGain();
+  silentSink.gain.value = 0;
+  workletNode.connect(silentSink);
+  silentSink.connect(audioCtx.destination);
+
+  setStatus('mic ready — connecting…', false);
+
+  ws = new WebSocket(wsUrlInput.value);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => {
+    setStatus('listening', true);
+    stopBtn.disabled = false;
+  };
+
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'partial') {
+      renderTranscript(msg.text);
+    } else if (msg.type === 'final') {
+      committedText = (committedText + ' ' + msg.text).trim();
+      renderTranscript('');
+      setStatus('finished', false);
+    }
+  };
+
+  ws.onerror = () => setStatus('connection error', false);
+  ws.onclose = () => {
+    if (statusText.textContent !== 'finished') setStatus('disconnected', false);
+  };
+}
+
+function stop() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send('END');
+  }
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  if (workletNode) workletNode.disconnect();
+  if (audioCtx) audioCtx.close();
+  meterFill.style.width = '0%';
+  stopBtn.disabled = true;
+  startBtn.disabled = false;
+  setStatus('stopped — finalizing…', false);
+}
+
+startBtn.addEventListener('click', start);
+stopBtn.addEventListener('click', stop);
+</script>
+
+</body>
+</html>
