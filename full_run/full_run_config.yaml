@@ -134,7 +134,7 @@ model:
       mt-MT: 102
       auto: 101
   train_ds:
-    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run/train_manifest.json
+    manifest_filepath: D:/NemoASR/full_run/full_run_train_manifest.json
     sample_rate: 16000
     use_lhotse: true
     shard_manifests: true
@@ -285,7 +285,7 @@ model:
     use_bucketing: true
     defer_setup: true
   validation_ds:
-    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run/val_manifest.json
+    manifest_filepath: D:/NemoASR/full_run/full_run_val_manifest.json
     sample_rate: 16000
     batch_size: 2
     shuffle: false
@@ -427,7 +427,7 @@ model:
     unified_auto_ratio: 0.0
     lang_field: target_lang
   test_ds:
-    manifest_filepath: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run/val_manifest.json
+    manifest_filepath: D:/NemoASR/full_run/full_run_val_manifest.json
     sample_rate: 16000
     batch_size: 16
     shuffle: false
@@ -566,7 +566,7 @@ model:
     unified_auto_ratio: 0.0
     lang_field: target_lang
   tokenizer:
-    dir: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/extracted_tokenizer
+    dir: D:/NemoASR/extracted_tokenizer
     type: bpe
   preprocessor:
     _target_: nemo.collections.asr.modules.AudioToMelSpectrogramPreprocessor
@@ -26892,7 +26892,7 @@ trainer:
   limit_train_batches: 50
   gradient_clip_val: 1.0
 exp_manager:
-  exp_dir: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run
+  exp_dir: D:/NemoASR/full_run
   create_tensorboard_logger: true
   create_checkpoint_callback: true
   checkpoint_callback_params:
@@ -26902,4 +26902,4 @@ exp_manager:
     always_save_nemo: true
   resume_if_exists: false
   resume_ignore_no_checkpoint: true
-init_from_nemo_model: /home/nextai/asr-nepali/Nepali-ASR-FineTuning/nemotron-3.5-asr-streaming-0.6b.nemo
+init_from_nemo_model: D:/NemoASR/nemotron-3.5-asr-streaming-0.6b.nemo

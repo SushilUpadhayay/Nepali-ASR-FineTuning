@@ -35,6 +35,7 @@ import threading
 import time
 import traceback
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
@@ -46,7 +47,14 @@ import nemo.collections.asr as nemo_asr
 # CONFIGURATION  (edit these constants before running)
 # ==============================================================================
 
-MODEL_PATH: str = "D:/FineTuning/final_after_150steps.nemo"
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_CANDIDATE_MODEL_PATHS = [
+    _PROJECT_ROOT / "final_after_150steps.nemo",
+    _PROJECT_ROOT / "tuned_output" / "final_after_150steps.nemo",
+    _PROJECT_ROOT / "warmstart_run" / "final_after_150steps.nemo",
+    Path("D:/NemoASR/final_after_150steps.nemo"),
+]
+MODEL_PATH: str = str(next((p for p in _CANDIDATE_MODEL_PATHS if p.exists()), _CANDIDATE_MODEL_PATHS[0]))
 TARGET_LANG: str = "ne-NP"
 DEVICE: str = "cpu"
 THREADS: Optional[int] = None          # None -> use os.cpu_count()

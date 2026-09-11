@@ -1,36 +1,65 @@
-# Virtual environment
-.myenv/
-.myvenv/
+# ==============================================================================
+# Git Ignore Configuration for Nepali ASR Project
+# ==============================================================================
 
-# NVIDIA NeMo source
+# Virtual environments
+.venv/
+.myenv/
+venv/
+env/
+ENV/
+
+# NVIDIA NeMo source clone
 NeMo/
 
-# Audio Datasets
+# Audio Datasets & Archives
+pilot_run/audio_files/
 pilot_run/pilot_audio/
-tuning_run/tuning_audio/
+full_run/audio_files/
+testing_audio_files/
+*.zip
+*.tar
+*.tar.gz
 
-# Model files
+# Model Weights & Checkpoints
 *.nemo
 *.ckpt
+*.pt
+*.bin
+*.onnx
 
-# Model Outputs
-pilot_run/default
-tuning_run/default
+# Experiment Outputs & TensorBoard Logs
+pilot_run/default/
+full_run/default/
+tuned_output/default/
+**/default/
+lightning_logs/
+*.tfevents.*
 
-# Datasets
+# Datasets & Manifests
 *.parquet
+manifest_infer.json
 
-# Jupyter cache
-.ipynb_checkpoints/
+# Extracted Tokenizer Artifacts
+extracted_tokenizer/
 
-# Python cache
-__pycache__/
-*.pyc
-
-# Output logs
+# Output & Benchmark Logs
+*.log
+crash_test.log
 full_run_capture.txt
+high.txt
+medium.txt
+low.txt
 
-# Original Tokenizer
-extracted_tokenizer/model_config.yaml
-extracted_tokenizer/tokenizer.model
-extracted_tokenizer/vocab.txt
+# Python & Jupyter Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+
+# OS / Editor Metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

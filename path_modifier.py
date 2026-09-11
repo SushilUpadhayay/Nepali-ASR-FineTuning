@@ -1,8 +1,8 @@
 from pathlib import Path
-root = Path("/home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run")
-files = ["manifest.json", "train_manifest.json", "val_manifest.json"]
-old = "d:/FineTuning/tuning_run/tuning_audio/"
-new = "/home/nextai/asr-nepali/Nepali-ASR-FineTuning/tuning_run/tuning_audio/"
+root = Path("D:/NemoASR/pilot_run")
+files = ["pilot_run_manifest.json", "pilot_run_train_manifest.json", "pilot_run_val_manifest.json"]
+old = "D:/NemoASR/pilot_run/audio_files"
+new = "D:/NemoASR/pilot_run/audio_files/"
 for name in files:
     path = root / name
     if path.exists():
